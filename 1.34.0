@@ -1,0 +1,17 @@
+Collecting boto3
+  Downloading boto3-1.43.4-py3-none-any.whl.metadata (6.5 kB)
+Collecting botocore<1.44.0,>=1.43.4 (from boto3)
+  Downloading botocore-1.43.4-py3-none-any.whl.metadata (5.5 kB)
+Requirement already satisfied: jmespath<2.0.0,>=0.7.1 in d:\conda\envs\xiaozhi-esp32-server\lib\site-packages (from boto3) (0.10.0)
+Collecting s3transfer<0.18.0,>=0.17.0 (from boto3)
+  Using cached s3transfer-0.17.0-py3-none-any.whl.metadata (1.7 kB)
+Requirement already satisfied: python-dateutil<3.0.0,>=2.1 in d:\conda\envs\xiaozhi-esp32-server\lib\site-packages (from botocore<1.44.0,>=1.43.4->boto3) (2.9.0.post0)
+Requirement already satisfied: urllib3!=2.2.0,<3,>=1.25.4 in d:\conda\envs\xiaozhi-esp32-server\lib\site-packages (from botocore<1.44.0,>=1.43.4->boto3) (2.6.3)
+Requirement already satisfied: six>=1.5 in d:\conda\envs\xiaozhi-esp32-server\lib\site-packages (from python-dateutil<3.0.0,>=2.1->botocore<1.44.0,>=1.43.4->boto3) (1.17.0)
+Downloading boto3-1.43.4-py3-none-any.whl (140 kB)
+Downloading botocore-1.43.4-py3-none-any.whl (15.0 MB)
+   ---------------------------------------- 15.0/15.0 MB 41.1 MB/s  0:00:00
+Using cached s3transfer-0.17.0-py3-none-any.whl (86 kB)
+Installing collected packages: botocore, s3transfer, boto3
+
+Successfully installed boto3-1.43.4 botocore-1.43.4 s3transfer-0.17.0

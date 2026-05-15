@@ -1,0 +1,47 @@
+# Stage 1: Build Vue frontend
+FROM node:18 AS web-builder
+WORKDIR /app
+COPY main/manager-web/package*.json ./
+RUN npm install
+COPY main/manager-web .
+RUN npm run build
+
+# Stage 2: Build Java backend
+FROM maven:3.9.4-eclipse-temurin-21 AS api-builder
+WORKDIR /app
+COPY main/manager-api/pom.xml .
+COPY main/manager-api/src ./src
+RUN mvn clean package -Dmaven.test.skip=true
+
+# Stage 3: Final runtime image
+FROM bellsoft/liberica-runtime-container:jre-21-glibc
+
+# Install Nginx and font libraries
+RUN apk update && \
+    apk add --no-cache --no-scripts \
+        nginx \
+        bash \
+        fontconfig \
+        ttf-dejavu \
+    && rm -rf /var/cache/apk/* \
+    && mkdir -p /run/nginx /var/log/nginx /var/tmp/nginx /etc/nginx/conf.d
+
+# Copy bundled fonts
+COPY main/manager-web/public/generator/static/fonts/*.ttf /usr/share/fonts/
+RUN fc-cache -f -v
+
+# Nginx config
+COPY docs/docker/nginx.conf /etc/nginx/nginx.conf
+
+# Copy frontend build output
+COPY --from=web-builder /app/dist /usr/share/nginx/html
+
+# Copy Java backend JAR
+COPY --from=api-builder /app/target/xiaozhi-esp32-api.jar /app/xiaozhi-esp32-api.jar
+
+EXPOSE 8002
+
+# Entrypoint script
+COPY docs/docker/start.sh /start.sh
+RUN chmod +x /start.sh
+CMD ["/start.sh"]

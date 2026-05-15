@@ -1,0 +1,131 @@
+# Docker安装Server — Qdrant + Redis + Xiaozhi Server
+
+services:
+  xiaozhi-esp32-server:
+    image: ghcr.nju.edu.cn/xinnan-tech/xiaozhi-esp32-server:server_latest
+    container_name: xiaozhi-esp32-server
+    restart: always
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      # Redis connection (dùng cho session cache, rate limiting, etc.)
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=xiaozhi_redis_2024
+    ports:
+      # ws服务端
+      - "8000:8000"
+      # http服务的端口，用于简单OTA接口(单服务部署)，以及视觉分析接口
+      - "8003:8003"
+    volumes:
+      # Config + data
+      - ./data:/opt/xiaozhi-esp32-server/data
+      # Models
+      - ./models:/opt/xiaozhi-esp32-server/models
+      # Custom Python code (override image defaults)
+      - ./core:/opt/xiaozhi-esp32-server/core
+      - ./plugins_func:/opt/xiaozhi-esp32-server/plugins_func
+      - ./config:/opt/xiaozhi-esp32-server/config
+      - ./app.py:/opt/xiaozhi-esp32-server/app.py
+      - ./config.yaml:/opt/xiaozhi-esp32-server/config.yaml
+      - ./config_from_api.yaml:/opt/xiaozhi-esp32-server/config_from_api.yaml
+      - ./storyteller-prompt.txt:/opt/xiaozhi-esp32-server/storyteller-prompt.txt
+      - ./agent-base-prompt.txt:/opt/xiaozhi-esp32-server/agent-base-prompt.txt
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Qdrant vector database for RAG
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    container_name: qdrant
+    restart: always
+    ports:
+      - "6333:6333"    # REST API + Web UI (http://localhost:6333/dashboard)
+      - "6334:6334"    # gRPC
+    volumes:
+      - ./data/qdrant:/qdrant/storage
+    environment:
+      - QDRANT__LOG_LEVEL=INFO
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/localhost/6333' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # Redis — session cache, rate limiting, pub/sub
+  redis:
+    image: redis:7.2-alpine
+    container_name: xiaozhi-esp32-server-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    command: >
+      redis-server
+      --requirepass xiaozhi_redis_2024
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --loglevel notice
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "xiaozhi_redis_2024", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # MySQL — manager-api backend database
+  mysql:
+    image: mysql:8.0
+    container_name: xiaozhi-esp32-server-mysql
+    restart: always
+    ports:
+      - "3307:3306"    # Host 3307 → Container 3306 (tránh conflict với MySQL local)
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=xiaozhi_esp32_server
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --max-connections=200
+      --innodb-buffer-pool-size=256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Voiceprint Recognition Service (Resemblyzer)
+  voiceprint-service:
+    build:
+      context: ../voiceprint-service
+      dockerfile: Dockerfile
+    container_name: xiaozhi-voiceprint-service
+    restart: always
+    ports:
+      - "8100:8100"
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - VOICEPRINT_API_KEY=voiceprint-secret-key
+      - VOICEPRINT_DATA_DIR=/app/data/voiceprints
+    volumes:
+      - ./data/voiceprints:/app/data/voiceprints
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8100/voiceprint/health?key=voiceprint-secret-key')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s

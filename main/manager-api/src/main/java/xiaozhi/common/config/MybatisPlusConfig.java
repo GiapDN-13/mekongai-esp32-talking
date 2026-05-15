@@ -1,0 +1,36 @@
+package xiaozhi.common.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+
+import xiaozhi.common.interceptor.DataFilterInterceptor;
+
+/**
+ * MyBatis-Plus configuration.
+ * Copyright (c) Renren Open Source. All rights reserved.
+ * Website: https://www.renren.io
+ */
+@Configuration
+public class MybatisPlusConfig {
+
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+        // Row-level data permission filter
+        mybatisPlusInterceptor.addInnerInterceptor(new DataFilterInterceptor());
+        // Pagination
+        mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+        // Optimistic locking
+        mybatisPlusInterceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+        // Block full-table UPDATE/DELETE without a WHERE clause
+        mybatisPlusInterceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+
+        return mybatisPlusInterceptor;
+    }
+
+}

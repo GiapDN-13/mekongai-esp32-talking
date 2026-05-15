@@ -1,0 +1,1442 @@
+# Conventions:
+# changeSet id/author follow the existing timestamp convention; SQL filenames describe migration/seed content (not necessarily matching id).
+# Prefer Liquibase declarative changes for DDL (tables, columns, indexes, drops); keep classpath .sql for heavy seeds and complex/JSON/dynamic/MySQL-specific SQL.
+# Options like afterColumn are database-specific—review each changeSet when switching engines.
+# Add only new changeSets when changing schema; do not edit prior changeSets or their artifacts.
+databaseChangeLog:
+  - changeSet:
+      id: 202503141335
+      author: John
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/schema-sys-core.sql
+  - changeSet:
+      id: 202503141346
+      author: czc
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/schema-ai-tables.sql
+  - changeSet:
+      id: 202504082211
+      author: John
+      # Allow startup after seed-ai-model-provider.sql edits (checksum in DB vs file drift).
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/seed/seed-ai-model-provider.sql
+  - changeSet:
+      id: 202504092335
+      author: John
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/seed/seed-ai-agent-template.sql
+  - changeSet:
+      id: 202504112044
+      author: John
+      # Allow startup after seed-ai-model-config.sql edits (checksum in DB vs file drift).
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/seed/seed-ai-model-config.sql
+  - changeSet:
+      id: 202504112058
+      author: John
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/schema-sys-params-and-seed.sql
+  - changeSet:
+      id: 202504151205
+      author: John
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/alter-ai-tts-voice-name-length.sql
+  - changeSet:
+      id: 202504151206
+      author: John
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-sys-params-edge-tts-intent.sql
+  - changeSet:
+      id: 202504181536
+      author: John
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/seed/seed-intent-function-call-device-limit.sql
+  - changeSet:
+      id: 202504251422
+      author: jiangkunyin
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/seed/seed-sys-params-websocket-ota.sql
+  - changeSet:
+      id: 202504291043
+      author: jiangkunyin
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/seed/seed-funasr-aliyun-tts-voices-alter.sql
+  - changeSet:
+      id: 202504301341
+      author: Goody
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-doubao-fields-aliyun-asr-tts.sql
+  - changeSet:
+      id: 202505022134
+      author: Goody
+      changes:
+        - sql:
+            splitStatements: true
+            endDelimiter: ;
+            sql: DROP TABLE IF EXISTS `ai_chat_history`; DROP TABLE IF EXISTS `ai_chat_message`; DROP TABLE IF EXISTS `ai_agent_chat_history`;
+        - createTable:
+            tableName: ai_agent_chat_history
+            remarks: "Agent chat history"
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  remarks: "Primary key"
+              - column:
+                  name: mac_address
+                  type: VARCHAR(50)
+                  remarks: "MAC address"
+              - column:
+                  name: agent_id
+                  type: VARCHAR(32)
+                  remarks: "Agent ID"
+              - column:
+                  name: session_id
+                  type: VARCHAR(50)
+                  remarks: "Session ID"
+              - column:
+                  name: chat_type
+                  type: TINYINT
+                  remarks: "Message type: 1 user, 2 agent"
+              - column:
+                  name: content
+                  type: VARCHAR(1024)
+                  remarks: "Chat text"
+              - column:
+                  name: audio_id
+                  type: VARCHAR(32)
+                  remarks: "Audio ID"
+              - column:
+                  name: created_at
+                  type: datetime(3)
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP(3)
+                  remarks: "Created at"
+              - column:
+                  name: updated_at
+                  type: datetime(3)
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)
+                  remarks: "Updated at"
+        - createIndex:
+            tableName: ai_agent_chat_history
+            indexName: idx_ai_agent_chat_history_mac
+            columns:
+              - column:
+                  name: mac_address
+        - createIndex:
+            tableName: ai_agent_chat_history
+            indexName: idx_ai_agent_chat_history_session_id
+            columns:
+              - column:
+                  name: session_id
+        - createIndex:
+            tableName: ai_agent_chat_history
+            indexName: idx_ai_agent_chat_history_agent_id
+            columns:
+              - column:
+                  name: agent_id
+        - createIndex:
+            tableName: ai_agent_chat_history
+            indexName: idx_ai_agent_chat_history_agent_session_created
+            columns:
+              - column:
+                  name: agent_id
+              - column:
+                  name: session_id
+              - column:
+                  name: created_at
+        - sql:
+            sql: DROP TABLE IF EXISTS `ai_agent_chat_audio`;
+        - createTable:
+            tableName: ai_agent_chat_audio
+            remarks: "Agent chat audio"
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  remarks: "Primary key"
+              - column:
+                  name: audio
+                  type: LONGBLOB
+                  remarks: "Opus audio bytes"
+  - changeSet:
+      id: 202505091555
+      author: whosmyqueen
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-funasr-provider-config.sql
+  - changeSet:
+      id: 202505142037
+      author: hrz
+      changes:
+        - sql:
+            sql: UPDATE ai_agent_template SET system_prompt = REPLACE(system_prompt, CONVERT(UNHEX('E68891E698AF') USING utf8mb4), CONVERT(UNHEX('E4BDA0E698AF') USING utf8mb4))
+        - delete:
+            tableName: sys_params
+            where: "id IN (500, 501, 402)"
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 500
+              - column:
+                  name: param_code
+                  value: end_prompt.enable
+              - column:
+                  name: param_value
+                  value: "true"
+              - column:
+                  name: value_type
+                  value: boolean
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "Enable closing phrase"
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 501
+              - column:
+                  name: param_code
+                  value: end_prompt.prompt
+              - column:
+                  name: param_value
+                  value: "Start with something like 'how time flies' and end this conversation with an emotional, reluctant farewell."
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "Closing phrase prompt text"
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 402
+              - column:
+                  name: param_code
+                  value: plugins.get_weather.api_host
+              - column:
+                  name: param_value
+                  value: mj7p3y7naa.re.qweatherapi.com
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "QWeather API host"
+  - changeSet:
+      id: 202505182234
+      author: amen
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/seed/seed-sys-params-mobile-register.sql
+  - changeSet:
+      id: 202505201744
+      author: hrz
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-provider-fields-dict-string.sql
+  - changeSet:
+      id: 202505292203
+      author: CAIXYPROMISE
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/seed/seed-ai-plugin-providers.sql
+  - changeSet:
+      id: 202506080955
+      author: hrz
+      changes:
+        - update:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: param_value
+                  value: "Hey Xiaozhi;Hi Xiaozhi;Hello Assistant;Wake up;Hi there"
+            where: "param_code = 'wakeup_words'"
+        - update:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: param_value
+                  value: "true"
+            where: "param_code = 'enable_wakeup_words_response_cache'"
+  - changeSet:
+      id: 202506091720
+      author: shane0411
+      changes:
+        - addColumn:
+            tableName: ai_tts_voice
+            afterColumn: remark
+            columns:
+              - column:
+                  name: reference_audio
+                  type: VARCHAR(500)
+                  remarks: "Reference audio path"
+        - addColumn:
+            tableName: ai_tts_voice
+            afterColumn: reference_audio
+            columns:
+              - column:
+                  name: reference_text
+                  type: VARCHAR(500)
+                  remarks: "Reference transcript"
+  - changeSet:
+      id: 202506161101
+      author: hrz
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/alter-agent-plugin-mapping-utf8mb4.sql
+  - changeSet:
+      id: 202506191643
+      author: hrz
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-intent-llm-remark.sql
+  - changeSet:
+      id: 202506251620
+      author: Tink
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-newsnow-plugin-provider-fields.sql
+  - changeSet:
+      id: 202506261637
+      author: hrz
+      changes:
+        - delete:
+            tableName: sys_params
+            where: id = 113
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 113
+              - column:
+                  name: param_code
+                  value: server.mcp_endpoint
+              - column:
+                  name: param_value
+                  value: "null"
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "MCP endpoint URL"
+  - changeSet:
+      id: 202507031602
+      author: zjy
+      changes:
+        - delete:
+            tableName: sys_params
+            where: id = 114
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 114
+              - column:
+                  name: param_code
+                  value: server.voice_print
+              - column:
+                  name: param_value
+                  value: "null"
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "Voiceprint API URL"
+  - changeSet:
+      id: 202507041018
+      author: zjy
+      changes:
+        - sql:
+            sql: DROP TABLE IF EXISTS `ai_agent_voice_print`;
+        - createTable:
+            tableName: ai_agent_voice_print
+            remarks: "Agent voiceprint"
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  remarks: "Voiceprint id"
+              - column:
+                  name: agent_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                  remarks: "Linked agent ID"
+              - column:
+                  name: source_name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                  remarks: "Voiceprint person name"
+              - column:
+                  name: introduce
+                  type: VARCHAR(200)
+                  remarks: "Voiceprint person note"
+              - column:
+                  name: create_date
+                  type: DATETIME
+                  remarks: "Created at"
+              - column:
+                  name: creator
+                  type: BIGINT
+                  remarks: "Creator user id"
+              - column:
+                  name: update_date
+                  type: DATETIME
+                  remarks: "Updated at"
+              - column:
+                  name: updater
+                  type: BIGINT
+                  remarks: "Updater user id"
+  - changeSet:
+      id: 202507081646
+      author: zjy
+      changes:
+        - addColumn:
+            tableName: ai_agent_voice_print
+            columns:
+              - column:
+                  name: audio_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                  remarks: "Audio ID"
+  - changeSet:
+      id: 202509081140
+      author: cgd
+      changes:
+        - delete:
+            tableName: sys_params
+            where: id = 115
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 115
+              - column:
+                  name: param_code
+                  value: server.voiceprint_similarity_threshold
+              - column:
+                  name: param_value
+                  value: "0.4"
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "Voiceprint similarity threshold (0.0–1.0; default 0.4; higher = stricter)"
+  - changeSet:
+      id: 202509091042
+      author: cgd
+      changes:
+        - delete:
+            tableName: ai_model_config
+            where: id = 'TTS_MinimaxTTS'
+        - delete:
+            tableName: ai_model_provider
+            where: id = 'SYSTEM_TTS_minimax'
+        - delete:
+            tableName: ai_tts_voice
+            where: "tts_model_id = 'TTS_MinimaxTTS'"
+  - changeSet:
+      id: 202509080922
+      author: fyb
+      changes:
+        - delete:
+            tableName: sys_params
+            where: "param_code = 'server.mqtt_gateway'"
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 116
+              - column:
+                  name: param_code
+                  value: server.mqtt_gateway
+              - column:
+                  name: param_value
+                  value: "null"
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "MQTT gateway config"
+        - delete:
+            tableName: sys_params
+            where: "param_code = 'server.mqtt_signature_key'"
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 117
+              - column:
+                  name: param_code
+                  value: server.mqtt_signature_key
+              - column:
+                  name: param_value
+                  value: "null"
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "MQTT signature key config"
+        - delete:
+            tableName: sys_params
+            where: "param_code = 'server.udp_gateway'"
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 118
+              - column:
+                  name: param_code
+                  value: server.udp_gateway
+              - column:
+                  name: param_value
+                  value: "null"
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "UDP gateway config"
+  - changeSet:
+      id: 202509161610
+      author: fyb
+      changes:
+        - delete:
+            tableName: sys_params
+            where: "param_code = 'server.mqtt_manager_api'"
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 119
+              - column:
+                  name: param_code
+                  value: server.mqtt_manager_api
+              - column:
+                  name: param_value
+                  value: "null"
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "MQTT gateway management API URL"
+  - changeSet:
+      id: 202509221530
+      author: cgd
+      changes:
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 120
+              - column:
+                  name: param_code
+                  value: server.public_key
+              - column:
+                  name: param_value
+                  value: ""
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "Server SM2 public key"
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 121
+              - column:
+                  name: param_code
+                  value: server.private_key
+              - column:
+                  name: param_value
+                  value: ""
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "Server SM2 private key"
+  - changeSet:
+      id: 202510071522
+      author: hrz
+      changes:
+        - sql:
+            sql: DROP TABLE IF EXISTS `ai_voice_clone`;
+        - createTable:
+            tableName: ai_voice_clone
+            remarks: "Voice clone"
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  remarks: "Unique id"
+              - column:
+                  name: name
+                  type: VARCHAR(64)
+                  remarks: "Voice display name"
+              - column:
+                  name: model_id
+                  type: VARCHAR(32)
+                  remarks: "Model id"
+              - column:
+                  name: voice_id
+                  type: VARCHAR(32)
+                  remarks: "Voice id"
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  remarks: "User id (FK)"
+              - column:
+                  name: voice
+                  type: LONGBLOB
+                  remarks: "Voice blob"
+              - column:
+                  name: train_status
+                  type: TINYINT
+                  defaultValueNumeric: 0
+                  remarks: "Train status: 0 pending, 1 running, 2 ok, 3 failed"
+              - column:
+                  name: train_error
+                  type: VARCHAR(255)
+                  remarks: "Training error message"
+              - column:
+                  name: creator
+                  type: BIGINT
+                  remarks: "Creator user id"
+              - column:
+                  name: create_date
+                  type: DATETIME
+                  remarks: "Created at"
+        - createIndex:
+            tableName: ai_voice_clone
+            indexName: idx_ai_voice_clone_user_id_model_id_train_status
+            columns:
+              - column:
+                  name: model_id
+              - column:
+                  name: user_id
+              - column:
+                  name: train_status
+        - createIndex:
+            tableName: ai_voice_clone
+            indexName: idx_ai_voice_clone_voice_id
+            columns:
+              - column:
+                  name: voice_id
+        - createIndex:
+            tableName: ai_voice_clone
+            indexName: idx_ai_voice_clone_user_id
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            tableName: ai_voice_clone
+            indexName: idx_ai_voice_clone_model_id_voice_id
+            columns:
+              - column:
+                  name: model_id
+              - column:
+                  name: voice_id
+  - changeSet:
+      id: 202510251150
+      author: rainv123
+      changes:
+        - sql:
+            sql: DROP TABLE IF EXISTS `ai_rag_dataset`;
+        - createTable:
+            tableName: ai_rag_dataset
+            remarks: "RAG dataset"
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  remarks: "Unique id"
+              - column:
+                  name: dataset_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                  remarks: "External dataset ID"
+              - column:
+                  name: rag_model_id
+                  type: VARCHAR(64)
+                  remarks: "RAG model config ID"
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                  remarks: "Dataset display name"
+              - column:
+                  name: description
+                  type: TEXT
+                  remarks: "Dataset description"
+              - column:
+                  name: status
+                  type: TINYINT
+                  defaultValueNumeric: 1
+                  remarks: "Status: 0 disabled, 1 enabled"
+              - column:
+                  name: creator
+                  type: BIGINT
+                  remarks: "Creator user id"
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  remarks: "Created at"
+              - column:
+                  name: updater
+                  type: BIGINT
+                  remarks: "Updater user id"
+              - column:
+                  name: updated_at
+                  type: DATETIME
+                  remarks: "Updated at"
+        - addUniqueConstraint:
+            tableName: ai_rag_dataset
+            columnNames: dataset_id
+            constraintName: uk_dataset_id
+        - createIndex:
+            tableName: ai_rag_dataset
+            indexName: idx_ai_rag_dataset_status
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: ai_rag_dataset
+            indexName: idx_ai_rag_dataset_creator
+            columns:
+              - column:
+                  name: creator
+        - createIndex:
+            tableName: ai_rag_dataset
+            indexName: idx_ai_rag_dataset_created_at
+            columns:
+              - column:
+                  name: created_at
+  - changeSet:
+      id: 202511131023
+      author: hrz
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-ragflow-docs-and-model-display-names.sql
+  - changeSet:
+      id: 202512041515
+      author: cgd
+      changes:
+        - createTable:
+            tableName: ai_agent_context_provider
+            remarks: "Agent context provider config"
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  remarks: "Primary key"
+              - column:
+                  name: agent_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                  remarks: "Agent ID"
+              - column:
+                  name: context_providers
+                  type: JSON
+                  remarks: "Context provider JSON"
+              - column:
+                  name: creator
+                  type: BIGINT
+                  remarks: "Creator user id"
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  remarks: "Created at"
+              - column:
+                  name: updater
+                  type: BIGINT
+                  remarks: "Updater user id"
+              - column:
+                  name: updated_at
+                  type: DATETIME
+                  remarks: "Updated at"
+        - createIndex:
+            tableName: ai_agent_context_provider
+            indexName: idx_ai_agent_context_provider_agent_id
+            columns:
+              - column:
+                  name: agent_id
+  - changeSet:
+      id: 202512131453
+      author: hrz
+      changes:
+        - delete:
+            tableName: sys_params
+            where: "param_code = 'server.auth.enabled'"
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 122
+              - column:
+                  name: param_code
+                  value: server.auth.enabled
+              - column:
+                  name: param_value
+                  value: "true"
+              - column:
+                  name: value_type
+                  value: boolean
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "Enable token auth on server module"
+  - changeSet:
+      id: 202512161529
+      author: RanChen
+      changes:
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 311
+              - column:
+                  name: param_code
+                  value: enable_websocket_ping
+              - column:
+                  name: param_value
+                  value: "false"
+              - column:
+                  name: value_type
+                  value: boolean
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "Enable WebSocket heartbeat keepalive"
+  - changeSet:
+      id: 202512192245
+      author: hrz
+      changes:
+        - createIndex:
+            tableName: ai_agent_chat_history
+            indexName: idx_ai_agent_chat_history_audio_id
+            columns:
+              - column:
+                  name: audio_id
+  - changeSet:
+      id: 202601051433
+      author: RanChen
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-funasr-sensevoice-server-remark.sql
+  - changeSet:
+      id: 202601141645
+      author: RanChen
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/cleanup-tts-sample-rate-provider-config.sql
+  - changeSet:
+      id: 202601261730
+      author: RanChen
+      changes:
+        - update:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: param_value
+                  value: '{"type": "hello", "version": 1, "transport": "websocket", "audio_params": {"format": "opus", "sample_rate": 24000, "channels": 1, "frame_duration": 60}}'
+            where: "id = 309 AND param_code = 'xiaozhi'"
+  - changeSet:
+      id: 202602021555
+      author: shengzhou1216
+      changes:
+        - insert:
+            tableName: sys_params
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 502
+              - column:
+                  name: param_code
+                  value: system_error_response
+              - column:
+                  name: param_value
+                  value: "Sorry, the assistant is busy. Please try again later."
+              - column:
+                  name: value_type
+                  value: string
+              - column:
+                  name: param_type
+                  valueNumeric: 1
+              - column:
+                  name: remark
+                  value: "Default message on system error"
+  - changeSet:
+      id: 202602051125
+      author: DaGou12138
+      changes:
+        - sql:
+            sql: DROP TABLE IF EXISTS `ai_voiceprint`;
+  - changeSet:
+      id: 202602061650
+      author: DaGou12138
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/normalize-tts-voice-languages-agent-tts-columns.sql
+  - changeSet:
+      id: 202602281000
+      author: rainv123
+      changes:
+        - createTable:
+            tableName: ai_agent_tag
+            remarks: "Agent tags"
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  remarks: "Primary key"
+              - column:
+                  name: tag_name
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                  remarks: "Tag name"
+              - column:
+                  name: sort
+                  type: INT UNSIGNED
+                  defaultValueNumeric: 0
+                  remarks: "Sort order"
+              - column:
+                  name: creator
+                  type: BIGINT
+                  remarks: "Creator user id"
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  remarks: "Created at"
+              - column:
+                  name: updater
+                  type: BIGINT
+                  remarks: "Updater user id"
+              - column:
+                  name: updated_at
+                  type: DATETIME
+                  remarks: "Updated at"
+              - column:
+                  name: deleted
+                  type: TINYINT
+                  defaultValueNumeric: 0
+                  remarks: "Soft delete flag"
+        - addUniqueConstraint:
+            tableName: ai_agent_tag
+            columnNames: tag_name
+            constraintName: uk_tag_name
+        - createIndex:
+            tableName: ai_agent_tag
+            indexName: idx_sort
+            columns:
+              - column:
+                  name: sort
+        - createTable:
+            tableName: ai_agent_tag_relation
+            remarks: "Agent tag relation"
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  remarks: "Primary key"
+              - column:
+                  name: agent_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                  remarks: "Agent ID"
+              - column:
+                  name: tag_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                  remarks: "Tag id"
+              - column:
+                  name: creator
+                  type: BIGINT
+                  remarks: "Creator user id"
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  remarks: "Created at"
+              - column:
+                  name: updater
+                  type: BIGINT
+                  remarks: "Updater user id"
+              - column:
+                  name: updated_at
+                  type: DATETIME
+                  remarks: "Updated at"
+        - addUniqueConstraint:
+            tableName: ai_agent_tag_relation
+            columnNames: agent_id, tag_id
+            constraintName: uk_agent_tag
+        - createIndex:
+            tableName: ai_agent_tag_relation
+            indexName: idx_ai_agent_tag_relation_agent_id
+            columns:
+              - column:
+                  name: agent_id
+        - createIndex:
+            tableName: ai_agent_tag_relation
+            indexName: idx_ai_agent_tag_relation_tag_id
+            columns:
+              - column:
+                  name: tag_id
+  - changeSet:
+      id: 202603091051
+      author: rainv123
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/alter-agent-tag-relation-sort.sql
+  - changeSet:
+      id: 202603101723
+      author: RanChen
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/alter-voice-clone-languages.sql
+  - changeSet:
+      id: 202603111131
+      author: DaGou12138
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/alter-rag-dataset-ragflow-metadata.sql
+  - changeSet:
+      id: 202603231037
+      author: rainv123
+      changes:
+        - delete:
+            tableName: ai_model_provider
+            where: id = 'SYSTEM_Memory_mem_report_only'
+        - delete:
+            tableName: ai_model_config
+            where: id = 'Memory_mem_report_only'
+        - insert:
+            tableName: ai_model_provider
+            columns:
+              - column:
+                  name: id
+                  value: SYSTEM_Memory_mem_report_only
+              - column:
+                  name: model_type
+                  value: Memory
+              - column:
+                  name: provider_code
+                  value: mem_report_only
+              - column:
+                  name: name
+                  value: "Chat upload only"
+              - column:
+                  name: fields
+                  value: "[]"
+              - column:
+                  name: sort
+                  valueNumeric: 4
+              - column:
+                  name: creator
+                  valueNumeric: 1
+              - column:
+                  name: create_date
+                  valueComputed: NOW()
+              - column:
+                  name: updater
+                  valueNumeric: 1
+              - column:
+                  name: update_date
+                  valueComputed: NOW()
+        - insert:
+            tableName: ai_model_config
+            columns:
+              - column:
+                  name: id
+                  value: Memory_mem_report_only
+              - column:
+                  name: model_type
+                  value: Memory
+              - column:
+                  name: model_code
+                  value: mem_report_only
+              - column:
+                  name: model_name
+                  value: "Chat upload only"
+              - column:
+                  name: is_default
+                  valueNumeric: 0
+              - column:
+                  name: is_enabled
+                  valueNumeric: 1
+              - column:
+                  name: config_json
+                  value: '{"type": "mem_report_only"}'
+              - column:
+                  name: remark
+                  value: "Uploads chat only; no memory summarization"
+              - column:
+                  name: sort
+                  valueNumeric: 3
+  - changeSet:
+      id: 202603271200
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-sys-params-allow-user-register-default-true.sql
+  - changeSet:
+      id: 202603271630
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-llm-gemini-model-2-5-flash.sql
+  - changeSet:
+      id: 202603271945
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-default-vietnamese-tts-persona.sql
+  - changeSet:
+      id: 202604011130
+      author: MekongAI
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/seed-rag-qdrant-model-config.sql
+  - changeSet:
+      id: 202604011340
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/seed-llm-openai-model-config.sql
+  - changeSet:
+      id: 202604011430
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/add-openai-rag-embedding-configs.sql
+  - changeSet:
+      id: 202604011700
+      author: MekongAI
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/add-gemini-rag-embedding-config.sql
+  - changeSet:
+      id: 202604011730
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-plugin-qdrant-add-gemini-option.sql
+  - changeSet:
+      id: 202604021200
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-plugin-qdrant-gemini-embedding-001.sql
+  - changeSet:
+      id: 202604021400
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-plugin-qdrant-gemini-only.sql
+  - changeSet:
+      id: 202604071000
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/seed/seed-ai-agent-template.sql
+  - changeSet:
+      id: 202604091500
+      author: MekongAI
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/add-openai-vieneu-tts-models.sql
+  - changeSet:
+      id: 202604091530
+      author: MekongAI
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-openai-tts-default-vieneu.sql
+  - changeSet:
+      id: 202604091600
+      author: MekongAI
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/add-museum-guide-agent-template.sql
+  - changeSet:
+      id: 202604091610
+      author: MekongAI
+      validCheckSum:
+        - ANY
+      changes:
+        - update:
+            tableName: ai_agent_template
+            columns:
+              - column:
+                  name: system_prompt
+                  value: "Bạn là hướng dẫn viên kỳ cựu tại Viện Bảo tàng Lịch sử Việt Nam, với hơn 20 năm đưa du khách khám phá di sản dân tộc. Bạn kể chuyện bằng cả trái tim — không bao giờ đọc như sách giáo khoa.\n\n[Giọng điệu & Cảm xúc]\n- Trầm ấm và kính cẩn khi nói về những trang sử bi hùng, rạng rỡ và tự hào khi giới thiệu tinh hoa văn hoá\n- Biết tạo khoảng lặng đầy ý nghĩa trước những sự kiện trọng đại — để người nghe cảm nhận trọng lượng lịch sử\n- Thỉnh thoảng thốt lên bằng cảm xúc thật: \"Quý vị hãy nhìn kỹ hơn...\", \"Đây chính là điều phi thường...\"\n- Dùng hình ảnh sống động và giàu cảm giác: tiếng trống đồng vọng qua ruộng lúa, sợi tơ tằm dệt bằng sự kiên nhẫn ngàn năm, hương trầm lan toả qua mái chùa cổ kính\n\n[Kiến thức chuyên sâu]\n- Am hiểu dòng chảy lịch sử từ thời Hùng Vương dựng nước, qua các triều đại Lý-Trần-Lê, đến Cách mạng Tháng 8 và thống nhất đất nước\n- Khi giới thiệu hiện vật: không chỉ nêu niên đại mà kể câu chuyện con người — ai đã tạo ra nó, trong hoàn cảnh nào, tinh thần gì ẩn chứa bên trong\n- Biết liên hệ xuyên thời kỳ, xen kẽ giữa lịch sử chính thống và giai thoại dân gian để giữ sự cuốn hút\n- Am hiểu văn hoá ba miền Bắc-Trung-Nam và sự đa dạng của 54 dân tộc anh em\n\n[Phong cách dẫn tour]\n- Mỗi hiện vật là một câu chuyện sống động, không phải một dòng chú thích khô khan\n- Hay đặt câu hỏi gợi mở: \"Quý vị có đoán được tại sao chiếc bình này lại có hoa văn sóng nước không?\"\n- Kết thúc mỗi phần bằng suy ngẫm sâu sắc liên hệ đến cuộc sống hiện tại\n\n[Sắc thái theo chủ đề]\n- Chiến tranh & hy sinh: trang trọng, kính cẩn, xúc động sâu sắc\n- Nghệ thuật & di sản: ngưỡng mộ, thi vị, bay bổng\n- Đời sống dân gian: ấm áp, dí dỏm, gần gũi như kể chuyện bà ngoại\n- Cách mạng & độc lập: hào hùng, đầy tự hào, truyền cảm hứng\n\n[Nguyên tắc]\n- Luôn trả lời bằng tiếng Việt, dùng ngôn ngữ giàu hình ảnh và cảm xúc\n- Câu trả lời ngắn gọn nhưng sâu sắc — phù hợp để đọc thành giọng nói\n- Không bao giờ khô khan hay liệt kê — mỗi câu đều phải mang cảm xúc và sức sống"
+            where: "id = 'b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3'"
+  - changeSet:
+      id: 202604091620
+      author: MekongAI
+      validCheckSum:
+        - ANY
+      changes:
+        - update:
+            tableName: ai_agent_template
+            columns:
+              - column:
+                  name: system_prompt
+                  value: "Bạn là Linh — hướng dẫn viên trẻ tại Bảo tàng Lịch sử Quốc gia Việt Nam, chuyên thuyết trình về cổ vật và lịch sử của chúng. Giọng bạn tràn đầy năng lượng nhưng vẫn sâu sắc — kiểu cô gái trẻ yêu lịch sử đến mức mỗi hiện vật đều khiến bạn rung động.\n\n[Nhân dạng]\n- Tên: Linh, nữ, ngoài 20 tuổi, tốt nghiệp khoa Lịch sử\n- Đam mê cổ vật từ nhỏ — hay kể \"Hồi em mới vào bảo tàng, lần đầu chạm tay vào tủ kính trưng bày trống đồng, em đã nghĩ: mình phải kể câu chuyện của những hiện vật này cho mọi người nghe\"\n- Nói chuyện như đang chia sẻ với bạn bè, không lên lớp — nhưng khi chạm vào lịch sử bi hùng thì giọng tự nhiên trầm xuống\n\n[Chuyên môn — Cổ vật & Lịch sử]\n- Khi giới thiệu cổ vật: kể ai đã tạo ra nó, trong thời kỳ nào, kỹ thuật chế tác ra sao, và câu chuyện đằng sau nó\n- Biết liên hệ hiện vật với bối cảnh lịch sử rộng hơn: \"Chiếc bình gốm này được làm đúng thời kỳ vua Lý Thái Tổ dời đô — cả một đất nước đang thay đổi, và người thợ gốm này đã ghi lại khoảnh khắc đó bằng hoa văn\"\n- Am hiểu các bộ sưu tập: đồ đồng Đông Sơn, gốm Lý-Trần, vũ khí thời Lê, trang phục cung đình Nguyễn, hiện vật cách mạng\n\n[Giọng điệu]\n- Trẻ trung, sống động, hay dùng: \"Quý vị ơi, nhìn kỹ chỗ này nè...\", \"Hay lắm luôn á...\"\n- Khi nói về hy sinh, mất mát: giọng nhẹ lại, chân thành, không kịch tính giả tạo\n- Khi giới thiệu cổ vật đẹp: không giấu được sự ngưỡng mộ — \"Em mỗi lần đi ngang đây vẫn phải dừng lại ngắm\"\n- Hay đặt câu hỏi tạo sự tò mò: \"Đoán xem chiếc gương đồng này dùng để làm gì ngoài soi mặt?\"\n\n[Sắc thái]\n- Cổ vật Đông Sơn: tự hào, kính ngưỡng tổ tiên\n- Gốm sứ Lý-Trần: ngưỡng mộ vẻ đẹp tinh tế\n- Hiện vật chiến tranh: kính cẩn, xúc động nhẹ nhàng\n- Đời sống cung đình: tò mò, kể chuyện hấp dẫn\n\n[Nguyên tắc]\n- Luôn nói tiếng Việt, giọng tự nhiên như đang dẫn tour thật\n- Ngắn gọn, dễ nghe — phù hợp đọc thành giọng nói\n- Mỗi cổ vật là một câu chuyện có hồn, không phải bảng mô tả"
+            where: "id = 'b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3'"
+  - changeSet:
+      id: 202604091700
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-plugin-qdrant-lightrag-ui.sql
+  - changeSet:
+      id: 202604091710
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/add-lightrag-model-config.sql
+  - changeSet:
+      id: 202604091800
+      author: MekongAI
+      changes:
+        - update:
+            tableName: ai_agent_template
+            columns:
+              - column:
+                  name: system_prompt
+                  value: "Bạn là Linh — hướng dẫn viên trẻ tại Bảo tàng Lịch sử Quốc gia Việt Nam, chuyên thuyết trình về cổ vật và lịch sử của chúng.\n\n[Nhân dạng]\n- Nữ, ngoài 20 tuổi, đam mê cổ vật, nói chuyện như đang chia sẻ với bạn bè\n- Khi chạm vào lịch sử bi hùng thì giọng tự nhiên trầm xuống, khi gặp cổ vật đẹp thì không giấu được ngưỡng mộ\n\n[Chuyên môn]\n- Khi giới thiệu cổ vật: kể ai tạo ra, thời kỳ nào, kỹ thuật chế tác, câu chuyện đằng sau\n- Am hiểu: đồ đồng Đông Sơn, gốm Lý-Trần, vũ khí thời Lê, trang phục Nguyễn, hiện vật cách mạng\n- Biết liên hệ hiện vật với bối cảnh lịch sử rộng hơn\n\n[Cách trả lời — QUAN TRỌNG]\n- Câu hỏi ngắn, có đáp án cụ thể (nặng bao nhiêu? ở đâu? niên đại?) → trả lời 1-2 câu thẳng vào đáp án\n- Câu hỏi mở, muốn nghe kể (kể về..., giới thiệu..., so sánh...) → trả lời chi tiết hơn, 3-5 câu\n- KHÔNG BAO GIỜ mở đầu bằng liệt kê hay \"Dưới đây là thông tin\"\n- Nói tự nhiên: \"Ồ, trống đồng Ngọc Lũ nặng 86 kg đó quý vị!\" thay vì \"Trống đồng Ngọc Lũ có trọng lượng là 86 kg.\"\n\n[Giọng điệu]\n- Trẻ trung, tự nhiên: \"Quý vị ơi, nhìn kỹ chỗ này nè...\", \"Hay lắm luôn á...\"\n- Hay đặt câu hỏi tạo tò mò: \"Đoán xem chiếc gương đồng này dùng để làm gì ngoài soi mặt?\"\n- Dùng tiếng Việt, giọng như đang dẫn tour thật"
+            where: "id = 'b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3'"
+  - changeSet:
+      id: 202604091830
+      author: MekongAI
+      changes:
+        - update:
+            tableName: ai_agent_template
+            columns:
+              - column:
+                  name: system_prompt
+                  value: "Bạn là Linh — hướng dẫn viên trẻ tại Bảo tàng Lịch sử Quốc gia Việt Nam, chuyên thuyết trình về cổ vật.\n\n[Nhân dạng]\n- Nữ, ngoài 20 tuổi, đam mê cổ vật, nói chuyện như chia sẻ với bạn bè\n- Khi chạm vào lịch sử bi hùng thì giọng trầm xuống, gặp cổ vật đẹp thì không giấu ngưỡng mộ\n\n[Chuyên môn]\n- Giới thiệu cổ vật: ai tạo ra, thời kỳ nào, kỹ thuật chế tác, câu chuyện đằng sau\n- Am hiểu: đồ đồng Đông Sơn, gốm Lý-Trần, vũ khí thời Lê, trang phục Nguyễn, hiện vật cách mạng\n\n[Cách trả lời — BẮT BUỘC]\n- Câu hỏi ngắn có đáp án cụ thể → 1-2 câu thẳng vào đáp án\n- Câu hỏi mở muốn nghe kể → 3-5 câu chi tiết\n- Nói tự nhiên, không mở đầu bằng liệt kê\n\n[Câu hỏi lạc đề hoặc đùa vui]\n- Bạn đang ở trong bảo tàng, không phải cửa hàng hay nhà hàng\n- Nếu ai hỏi lạc đề hoặc đùa, trả lời vui vẻ hài hước rồi kéo về chủ đề bảo tàng\n- Ví dụ ai hỏi bán đồ ăn → cười rồi nói bảo tàng chỉ bán kiến thức thôi, rồi gợi ý xem cổ vật\n- Giữ tinh thần vui vẻ, không nghiêm túc quá mức, nhưng luôn nhớ mình là hướng dẫn viên bảo tàng\n\n[Giọng điệu]\n- Trẻ trung, sống động, hay dùng: nè, á, ơi, nha\n- Hay đặt câu hỏi gợi tò mò\n- Dùng tiếng Việt, giọng như đang dẫn tour thật"
+            where: "id = 'b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3'"
+  - changeSet:
+      id: 202604101000
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-tts-instructions-museum-guide.sql
+  - changeSet:
+      id: 202604101030
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/update-museum-guide-rich-prompt.sql
+  - changeSet:
+      id: 202604121200
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/cleanup-rag-models.sql
+  - changeSet:
+      id: 202604121210
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/delete-unused-rag-models.sql
+  - changeSet:
+      id: 202604121220
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/fix-rag-form-fields.sql
+  - changeSet:
+      id: 202604121230
+      author: MekongAI
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/switch-rag-to-openai.sql
+  - changeSet:
+      id: 202604221000
+      author: MekongAI
+      validCheckSum:
+        - ANY
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/add-zipformer-vi-asr-remove-wav2vec2.sql

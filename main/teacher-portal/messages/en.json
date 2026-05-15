@@ -1,0 +1,76 @@
+{
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "devices": "Robot Setup",
+    "knowledge": "Knowledge Base",
+    "insights": "Insights"
+  },
+  "Auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Sign In",
+    "registerButton": "Sign Up",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "welcome": "Welcome back",
+    "createAccount": "Create an account"
+  },
+  "Common": {
+    "teacherAssistant": "Teacher Assistant"
+  },
+  "Landing": {
+    "navHowItWorks": "How It Works",
+    "navFeatures": "Features",
+    "navTrust": "Trust & Safety",
+    "navCta": "Contact",
+
+    "heroTag": "AI-powered Education Platform",
+    "heroTitle": "AI Magic In Every Classroom",
+    "heroDescription": "An open-source AI robot assistant platform — combining ESP32 hardware, real-time voice interaction, and RAG-based knowledge retrieval to support teachers and engage students.",
+    "heroCta": "Get Started",
+    "heroSecondaryCta": "Learn More",
+
+    "howTitle": "The MekongAI Journey",
+    "howSubtitle": "Cutting-edge AI technology brings real-time voice interaction into the classroom.",
+    "how1Title": "Student Speaks",
+    "how1Desc": "Voice interaction directly with the robot assistant.",
+    "how2Title": "ESP32 Device",
+    "how2Desc": "Mic + Speaker + OLED display captures and plays audio.",
+    "how3Title": "Smart AI",
+    "how3Desc": "Natural language processing with RAG knowledge retrieval.",
+    "how4Title": "Robot Responds",
+    "how4Desc": "Natural voice response in under 1 second.",
+
+    "featuresTitle": "Outstanding Features",
+    "feature1Title": "RAG Knowledge Base",
+    "feature1Desc": "Teachers upload lecture notes — the system chunks, embeds via Qdrant, and retrieves context for accurate answers grounded in actual lesson content.",
+    "feature2Title": "Voiceprint Recognition",
+    "feature2Desc": "Speaker identification via voice embeddings — the robot recognizes individual students and personalizes interactions, tracking learning progress.",
+    "feature3Title": "Story & Lecture Library",
+    "feature3Desc": "Leveraging RAG technology for fast retrieval of lecture content, stories, and educational materials — enabling accurate robot responses.",
+
+    "trustTitle": "Safe for teachers, magical for students",
+    "trust1Title": "Absolute Safety",
+    "trust1Desc": "End-to-end encrypted system. Voice data is processed in real-time, never stored. Fully open source for transparency.",
+    "trust2Title": "Educational Value",
+    "trust2Desc": "Every answer is grounded in real lecture materials. The AI never fabricates — it only retrieves from the teacher's uploaded knowledge base.",
+
+    "ctaTitle": "Ready to start the journey?",
+    "ctaDescription": "Let MekongAI accompany you in bringing wonderful things to the classroom.",
+    "ctaButton": "Start Today",
+
+    "footerTagline": "Open-source AI teaching assistant platform for schools.",
+    "footerProductsTitle": "Product",
+    "footerProduct1": "How It Works",
+    "footerProduct2": "Features",
+    "footerProduct3": "Safety",
+    "footerSupportTitle": "Support",
+    "footerSupport1": "Documentation",
+    "footerLegalTitle": "Legal",
+    "footerLegal1": "Privacy Policy",
+    "footerLegal2": "Terms",
+    "footerCopyright": "© 2026 MekongAI. Open source under MIT License."
+  }
+}

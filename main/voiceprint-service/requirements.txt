@@ -1,0 +1,11 @@
+# Voiceprint Service Dependencies (CAM++ via speakerlab / 3D-Speaker)
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+speakerlab>=0.0.6
+modelscope>=1.28.0
+torch>=2.0.0
+torchaudio>=2.0.0
+numpy>=1.24.0,<2.0
+soundfile>=0.12.1
+librosa>=0.10.2

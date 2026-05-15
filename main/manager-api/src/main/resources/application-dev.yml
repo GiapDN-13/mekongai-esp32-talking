@@ -1,0 +1,43 @@
+knife4j:
+  production: false
+  enable: true
+  basic:
+    enable: false
+    username: renren
+    password: 2ZABCDEUgF
+  setting:
+    enableFooter: false
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3307/xiaozhi_esp32_server?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh&nullCatalogMeansCurrent=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 10
+      connection-timeout: 6000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: xiaozhi-hikari
+  jpa:
+    open-in-view: false
+    show-sql: false                                                                                                                                       
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: false
+  data:
+    redis:
+      host: 127.0.0.1         # Redis server address
+      port: 6379              # Redis server connection port
+      password: xiaozhi_redis_2024  # Redis server connection password
+      database: 0            # Redis database index (default is 0)
+      timeout: 10000ms       # Connection timeout (milliseconds)
+      lettuce:
+        pool:
+          max-active: 8      # Maximum number of connections in the connection pool (use negative values to indicate no limit)
+          max-idle: 8        # Maximum number of idle connections in the connection pool
+          min-idle: 0        # Minimum number of idle connections in the connection pool
+        shutdown-timeout: 100ms  # Waiting time for graceful shutdown of the client

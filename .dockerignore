@@ -1,0 +1,57 @@
+# === Version control ===
+.git/
+.gitignore
+.gitattributes
+
+# === Python artifacts ===
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+*.egg
+
+# === Environment / secrets ===
+.env
+.env.*
+.config.yaml
+.secrets.yaml
+.private_config.yaml
+
+# === Docker (avoid copying Dockerfiles into context) ===
+Dockerfile*
+docker-compose*.yml
+docker-setup.sh
+
+# === Runtime data (mounted as volumes) ===
+data/
+tmp/
+logs/
+music/
+models/
+
+# === IDE / editor ===
+.vscode/
+.cursor/
+.idea/
+*.swp
+*.swo
+
+# === Node.js (for manager-web) ===
+node_modules/
+.webpack_cache/
+
+# === Documentation / dev-only ===
+docs/
+*.md
+LICENSE
+PIPELINE_CLEANUP_REPORT.md
+
+# === OS artifacts ===
+.DS_Store
+Thumbs.db
+
+# === Test / benchmark artifacts ===
+test_docs/
+performance_tester/

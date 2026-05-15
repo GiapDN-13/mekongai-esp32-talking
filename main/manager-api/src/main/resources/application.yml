@@ -1,0 +1,72 @@
+# Tomcat
+server:
+  # Avoid 431 when Authorization/cookie is large (client Python, proxy, token saved incorrectly in localStorage)
+  max-http-request-header-size: 128KB
+  tomcat:
+    uri-encoding: UTF-8
+    threads:
+      max: 1000
+      min-spare: 30
+  port: 8002
+  servlet:
+    context-path: /xiaozhi
+    session:
+      cookie:
+        http-only: true
+
+spring:
+  # Environment dev|test|prod
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+  messages:
+    encoding: UTF-8
+    basename: i18n/messages
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+  main:
+    allow-bean-definition-overriding: true
+
+knife4j:
+  enable: true
+  basic:
+    enable: false
+    username: admin
+    password: admin
+  setting:
+    enableFooter: false
+
+renren:
+  redis:
+    open: true
+  xss:
+    enabled: true
+    exclude-urls:
+
+#mybatis
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  #Entity scanning, multiple packages separated by commas or semicolons
+  typeAliasesPackage: xiaozhi.modules.*.entity
+  global-config:
+    #Database related configurations
+    db-config:
+      #Primary key type
+      id-type: ASSIGN_ID
+    banner: false
+  #Native configurations
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+  configuration-properties:
+    prefix:
+    blobType: BLOB
+    boolValue: TRUE

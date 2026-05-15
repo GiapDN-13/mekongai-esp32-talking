@@ -1,0 +1,91 @@
+# Docker Compose cho VPS — CHỈ chạy infrastructure (MySQL, Redis, Qdrant, Voiceprint)
+# Manager API, Manager Web, Xiaozhi Server chạy native trên VPS (giống hệt local)
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    container_name: qdrant
+    restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./data/qdrant:/qdrant/storage
+    environment:
+      - QDRANT__LOG_LEVEL=INFO
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/localhost/6333' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: xiaozhi-esp32-server-redis
+    restart: always
+    ports:
+      - "6381:6379"
+    volumes:
+      - ./data/redis:/data
+    command: >
+      redis-server
+      --requirepass xiaozhi_redis_2024
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --loglevel notice
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "xiaozhi_redis_2024", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  mysql:
+    image: mysql:8.0
+    container_name: xiaozhi-esp32-server-mysql
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=xiaozhi_esp32_server
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --max-connections=200
+      --innodb-buffer-pool-size=256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  voiceprint-service:
+    build:
+      context: ../voiceprint-service
+      dockerfile: Dockerfile
+    container_name: xiaozhi-voiceprint-service
+    restart: always
+    ports:
+      - "8100:8100"
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - VOICEPRINT_API_KEY=voiceprint-secret-key
+      - VOICEPRINT_DATA_DIR=/app/data/voiceprints
+    volumes:
+      - ./data/voiceprints:/app/data/voiceprints
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8100/voiceprint/health?key=voiceprint-secret-key')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s

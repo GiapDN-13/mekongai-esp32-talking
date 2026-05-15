@@ -1,0 +1,76 @@
+{
+  "Navigation": {
+    "dashboard": "Tổng quan",
+    "devices": "Cài đặt Robot",
+    "knowledge": "Bài giảng",
+    "insights": "Phân tích"
+  },
+  "Auth": {
+    "login": "Đăng nhập",
+    "register": "Tạo tài khoản",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "loginButton": "Đăng nhập",
+    "registerButton": "Đăng ký",
+    "noAccount": "Chưa có tài khoản?",
+    "hasAccount": "Đã có tài khoản?",
+    "welcome": "Chào mừng trở lại",
+    "createAccount": "Tạo tài khoản mới"
+  },
+  "Common": {
+    "teacherAssistant": "Trợ lý Giáo viên"
+  },
+  "Landing": {
+    "navHowItWorks": "Hành trình",
+    "navFeatures": "Tính năng",
+    "navTrust": "An tâm",
+    "navCta": "Liên hệ",
+
+    "heroTag": "Nền tảng Giáo dục AI",
+    "heroTitle": "Phép Màu AI Trong Từng Lớp Học",
+    "heroDescription": "Nền tảng robot trợ giảng AI mã nguồn mở — kết hợp phần cứng ESP32, tương tác giọng nói thời gian thực, và truy xuất tri thức RAG để hỗ trợ giáo viên và thu hút học sinh.",
+    "heroCta": "Bắt đầu ngay",
+    "heroSecondaryCta": "Tìm hiểu thêm",
+
+    "howTitle": "Hành trình của MekongAI",
+    "howSubtitle": "Công nghệ AI tiên tiến mang trải nghiệm tương tác giọng nói thời gian thực vào lớp học.",
+    "how1Title": "Học sinh nói",
+    "how1Desc": "Ứng dụng tương tác giọng nói trực tiếp với robot.",
+    "how2Title": "Thiết bị ESP32",
+    "how2Desc": "Mic + Loa + Màn hình OLED thu phát âm thanh.",
+    "how3Title": "AI thông minh",
+    "how3Desc": "Xử lý ngôn ngữ tự nhiên và truy xuất tri thức RAG.",
+    "how4Title": "Robot phản hồi",
+    "how4Desc": "Giọng nói tự nhiên, phản hồi dưới 1 giây.",
+
+    "featuresTitle": "Những tính năng vượt trội",
+    "feature1Title": "Kho tri thức RAG",
+    "feature1Desc": "Giáo viên tải lên bài giảng — hệ thống chia nhỏ, nhúng vector qua Qdrant, và truy xuất ngữ cảnh cho câu trả lời chính xác theo nội dung bài học.",
+    "feature2Title": "Nhận diện giọng nói",
+    "feature2Desc": "Định danh người nói qua voice embedding — robot nhận ra từng học sinh và cá nhân hóa tương tác, theo dõi tiến độ học tập.",
+    "feature3Title": "Kho truyện & Bài giảng",
+    "feature3Desc": "Tận dụng công nghệ RAG để truy xuất nhanh nội dung bài giảng, truyện kể và tài liệu giáo dục — giúp robot trả lời chính xác.",
+
+    "trustTitle": "An tâm cho giáo viên, kỳ diệu cho học sinh",
+    "trust1Title": "An toàn tuyệt đối",
+    "trust1Desc": "Hệ thống được bảo mật end-to-end. Dữ liệu giọng nói được xử lý real-time, không lưu trữ. Toàn bộ mã nguồn mở để kiểm tra.",
+    "trust2Title": "Giá trị giáo dục",
+    "trust2Desc": "Mỗi câu trả lời được dựa trên tài liệu bài giảng thật. AI không bịa đặt — chỉ truy xuất từ kho tri thức giáo viên đã tải lên.",
+
+    "ctaTitle": "Sẵn sàng bắt đầu cuộc hành trình?",
+    "ctaDescription": "Hãy để MekongAI đồng hành cùng bạn mang những điều tuyệt vời đến lớp học.",
+    "ctaButton": "Bắt đầu ngay hôm nay",
+
+    "footerTagline": "Nền tảng robot trợ giảng AI mã nguồn mở cho trường học.",
+    "footerProductsTitle": "Sản phẩm",
+    "footerProduct1": "Hành trình",
+    "footerProduct2": "Tính năng",
+    "footerProduct3": "An toàn",
+    "footerSupportTitle": "Hỗ trợ",
+    "footerSupport1": "Tài liệu",
+    "footerLegalTitle": "Liên hệ",
+    "footerLegal1": "Chính sách bảo mật",
+    "footerLegal2": "Điều khoản",
+    "footerCopyright": "© 2026 MekongAI. Mã nguồn mở theo giấy phép MIT."
+  }
+}

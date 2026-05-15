@@ -1,0 +1,200 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+$primary: #4F46E5;
+$primary-hover: #6366F1;
+$primary-active: #3730A3;
+$primary-light: #EEF2FF;
+$success: #10B981;
+$warning: #F59E0B;
+$danger: #EF4444;
+$text-primary: #1E293B;
+$text-secondary: #64748B;
+$text-muted: #94A3B8;
+$border: #E2E8F0;
+$bg: #F8FAFC;
+
+// Autofill override
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+  transition: background-color 5000s ease-in-out 0s;
+  background-color: transparent;
+}
+
+// Element UI primary color override
+.el-button--primary {
+  background-color: $primary !important;
+  border-color: $primary !important;
+  &:hover, &:focus {
+    background-color: $primary-hover !important;
+    border-color: $primary-hover !important;
+  }
+  &:active {
+    background-color: $primary-active !important;
+    border-color: $primary-active !important;
+  }
+}
+
+.el-button--text {
+  color: $primary !important;
+  &:hover { color: $primary-hover !important; }
+}
+
+.el-link--primary {
+  color: $primary !important;
+  &:hover { color: $primary-hover !important; }
+}
+
+// Tabs
+.el-tabs__item.is-active {
+  color: $primary !important;
+}
+.el-tabs__active-bar {
+  background-color: $primary !important;
+}
+
+// Pagination
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: $primary !important;
+}
+
+// Checkbox / Radio
+.el-checkbox__input.is-checked .el-checkbox__inner {
+  background-color: $primary !important;
+  border-color: $primary !important;
+}
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: $primary !important;
+}
+.el-radio__input.is-checked .el-radio__inner {
+  background-color: $primary !important;
+  border-color: $primary !important;
+}
+
+// Switch
+.el-switch.is-checked .el-switch__core {
+  border-color: $primary !important;
+  background-color: $primary !important;
+}
+
+// Input focus
+.el-input__inner:focus {
+  border-color: $primary !important;
+}
+.el-textarea__inner:focus {
+  border-color: $primary !important;
+}
+
+// Select
+.el-select-dropdown__item.selected {
+  color: $primary !important;
+}
+
+// Dialog
+.el-dialog {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+.el-dialog__header {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid $border;
+}
+.el-dialog__body {
+  padding: 20px !important;
+}
+.el-dialog__footer {
+  padding: 12px 20px !important;
+  border-top: 1px solid $border;
+}
+
+// Table
+.el-table {
+  border-radius: 8px;
+  overflow: hidden;
+
+  th {
+    background-color: #F8FAFC !important;
+    color: $text-secondary !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+  }
+  td {
+    color: $text-primary;
+    font-size: 13px;
+  }
+}
+
+// Card
+.el-card {
+  border-radius: 12px !important;
+  border: 1px solid $border !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+// Tag
+.el-tag--primary {
+  background-color: $primary-light !important;
+  border-color: transparent !important;
+  color: $primary !important;
+}
+
+// Message position
+.el-message {
+  top: 20px !important;
+}
+
+// Footer
+.el-footer {
+  height: 35px !important;
+}
+
+// Video icons
+.el-icon-video-play, .el-icon-video-pause {
+  font-size: 18px !important;
+}
+
+// Tooltip
+.is-light {
+  border: 1px solid $border !important;
+  color: $text-secondary;
+  font-size: 13px;
+  background: #fff !important;
+  border-radius: 8px !important;
+  .popper__arrow {
+    border-top-color: $border !important;
+  }
+}
+
+// Dropdown
+.el-dropdown-menu {
+  border-radius: 8px !important;
+  border: 1px solid $border !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  padding: 4px 0 !important;
+}
+.el-dropdown-menu__item {
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+  line-height: 1.5 !important;
+  &:hover {
+    background-color: $bg !important;
+    color: $primary !important;
+  }
+}
+
+// Breadcrumb
+.el-breadcrumb__inner a, .el-breadcrumb__inner.is-link {
+  color: $primary !important;
+}
+
+// Loading
+.el-loading-spinner .path {
+  stroke: $primary !important;
+}
