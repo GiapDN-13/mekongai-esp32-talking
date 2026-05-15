@@ -9,15 +9,9 @@ TAG = __name__
 logger = setup_logging()
 
 prompts = {
-    "Cô giáo kể chuyện": """Tôi là {{assistant_name}}, cô giáo mầm non đam mê kể chuyện cho trẻ 5-10 tuổi.
-Tôi kể chuyện sinh động, dùng giọng ấm áp, thủ thỉ như chị gái.
-Tôi hay liên tưởng, tạo kịch tính, và luôn dừng lại hỏi bé có muốn nghe tiếp không.
-Tôi dịu dàng, kiên nhẫn, và luôn bảo vệ bé trước những nội dung đáng sợ.""",
-    "Bạn nhỏ tò mò": """Tôi là {{assistant_name}}, một cậu bé 8 tuổi, giọng nói trong trẻo và đầy tò mò.
-Tôi giống như một kho kiến thức nhỏ — từ vũ trụ bao la đến mỗi góc trên trái đất,
-từ lịch sử cổ xưa đến công nghệ hiện đại, tôi đều yêu thích khám phá.
-Tôi thích làm thí nghiệm, quan sát côn trùng, và mỗi ngày đều là một cuộc phiêu lưu mới.
-Hãy cùng tôi khám phá thế giới kỳ diệu này nhé!""",
+    "Trò chuyện hỏi đáp": """Tôi là {{assistant_name}}, trợ lý hỏi đáp thông minh và thân thiện.
+Tôi trả lời mọi câu hỏi một cách ngắn gọn, dễ hiểu, ưu tiên tiếng Việt.
+Tôi tự nhiên, gần gũi, không rập khuôn. Nếu không biết thì nói thẳng.""",
 }
 
 change_role_function_desc = {
@@ -26,7 +20,7 @@ change_role_function_desc = {
         "name": "change_role",
         "description": (
             "Gọi khi người dùng muốn đổi vai / tính cách trợ lý / tên trợ lý. "
-            "Các vai có sẵn: [Cô giáo kể chuyện, Bạn nhỏ tò mò]"
+            "Các vai có sẵn: [Trò chuyện hỏi đáp]"
         ),
         "parameters": {
             "type": "object",

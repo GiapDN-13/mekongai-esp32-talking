@@ -112,7 +112,7 @@ wakeup_words:
   - "xin chào"
   - "chào milo"
   - "milo ơi"
-  - "kể chuyện đi"
+  - "hey milo"
   - "chào bạn"
 
 # MCP endpoint WebSocket URL, e.g. ws://host:port/mcp/?token=...
@@ -245,17 +245,17 @@ voiceprint:
 prompt: ""
 
 # System prompt template file
-prompt_template: storyteller-prompt.txt
+prompt_template: qa-assistant-prompt.txt
 
 # Response when system encounters an error
-system_error_response: "Ôi, Milo bị trục trặc rồi. Bạn thử nói lại nhé!"
+system_error_response: "Xin lỗi, mình gặp trục trặc rồi. Bạn thử nói lại nhé!"
 
 # Closing prompt — farewell message when session ends
 end_prompt:
   enable: true
   prompt: |
-    Hãy kết thúc cuộc trò chuyện bằng một lời tạm biệt dễ thương, nhẹ nhàng, khiến trẻ cảm thấy vui.
-    Ví dụ: hẹn gặp lại, nhắc trẻ ngủ ngon, hoặc gợi ý câu chuyện ngày mai.
+    Hãy kết thúc cuộc trò chuyện bằng một lời tạm biệt ngắn gọn, thân thiện.
+    Ví dụ: hẹn gặp lại, chúc một ngày tốt lành.
 
 # ====================================================================================
 # MODULE SELECTION — Choose which provider to use for each module

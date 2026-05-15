@@ -216,9 +216,6 @@ class ConnectionHandler:
         self._last_mentioned_stories: list = []
         self._last_suggested_stories: list = []
         self._failed_stories: set = set()
-        
-        # Storyteller Agent
-        self.storyteller_agent = None
 
     async def handle_connection(self, ws: websockets.ServerConnection):
         try:
@@ -589,14 +586,6 @@ class ConnectionHandler:
             self._init_report_threads()
             """更新系统提示词"""
             self._init_prompt_enhancement()
-            
-            """Khởi tạo Storyteller Agent"""
-            try:
-                from core.agent.storyteller_agent import StorytellerAgent
-                self.storyteller_agent = StorytellerAgent(self.llm)
-                self.logger.bind(tag=TAG).info("Storyteller Agent initialized")
-            except Exception as e:
-                self.logger.bind(tag=TAG).error(f"Failed to initialize Storyteller Agent: {e}")
 
         except Exception as e:
             self.logger.bind(tag=TAG).error(f"Failed to instantiate components: {e}")
@@ -1411,25 +1400,8 @@ class ConnectionHandler:
                 except Exception as e:
                     self.logger.bind(tag=TAG).error(f"Long-term memory query error: {e}")
 
-            # Storyteller Agent processing
-            emotion_desc = None
-            thinking_result = None
-            if depth == 0 and query and hasattr(self, "storyteller_agent") and self.storyteller_agent:
-                try:
-                    time_context = self.storyteller_agent.thinking._get_time_context()
-                    agent_result = self.storyteller_agent.process_turn(query, time_context)
-                    emotion_desc = agent_result.get("emotion_desc")
-                    thinking_result = agent_result.get("thinking_result")
-                    self.logger.bind(tag=TAG).info(f"Storyteller Agent - Emotion: {emotion_desc}")
-                    if thinking_result:
-                        self.logger.bind(tag=TAG).info(f"Storyteller Agent - Thinking: {json.dumps(thinking_result, ensure_ascii=False)}")
-                except Exception as e:
-                    self.logger.bind(tag=TAG).error(f"Storyteller Agent processing error: {e}")
-
             llm_dialogue = self.dialogue.get_llm_dialogue_with_memory(
-                memory_str, self.config.get("voiceprint", {}),
-                emotion_desc=emotion_desc,
-                thinking_result=thinking_result
+                memory_str, self.config.get("voiceprint", {})
             )
 
             # Inject RAG context into last user message (NOT stored in history)
@@ -2201,39 +2173,14 @@ class ConnectionHandler:
             "Hãy đọc tên các truyện trên cho bé nghe và hỏi bé muốn nghe truyện nào."
         )
 
+
     def _push_mentioned_story(self, story_name: str):
-        """Push a story onto the mention stack (max 2 items)."""
-        if not story_name:
-            return
-        name_lower = story_name.lower().strip()
-        if self._last_mentioned_stories and self._last_mentioned_stories[0] == name_lower:
-            return
-        self._last_mentioned_stories.insert(0, name_lower)
-        if len(self._last_mentioned_stories) > 2:
-            self._last_mentioned_stories.pop()
+        pass
 
     def _scan_response_for_stories(self, text: str):
-        """Scan LLM response text for story names and push to mention stack."""
-        from core.utils.story_registry import story_registry
-        text_lower = text.lower()
-        for name in story_registry.get_all_story_names():
-            if name.lower() in text_lower:
-                self._push_mentioned_story(name)
-                break
+        pass
 
     def _pick_random_story(self, exclude: list = None) -> str:
-        """Pick a random story name from registry, excluding failed and given names."""
-        from core.utils.story_registry import story_registry
-        import random
-        all_names = story_registry.get_all_story_names()
-        exclude_set = set(self._failed_stories)
-        if exclude:
-            exclude_set.update(e.lower() for e in exclude)
-        candidates = [n for n in all_names if n.lower() not in exclude_set]
-        if not candidates:
-            candidates = all_names
-        if candidates:
-            return random.choice(candidates)
         return ""
 
     def _resolve_anaphoric_reference(self, query: str) -> str:

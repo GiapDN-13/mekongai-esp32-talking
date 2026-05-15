@@ -153,7 +153,6 @@ class Dialogue:
                             parts = speaker_str.split(",", 2)
                             if len(parts) >= 2:
                                 name = parts[1].strip()
-                                # 如果描述为空，则为""
                                 description = (
                                     parts[2].strip() if len(parts) >= 3 else ""
                                 )
@@ -162,10 +161,8 @@ class Dialogue:
                             pass
                     enhanced_system_prompt += "\n\n</speakers_info>"
             except:
-                # 配置读取失败时忽略错误，不影响其他功能
                 pass
 
-            # 使用正则表达式匹配 <memory> 标签，不管中间有什么内容
             if memory_str is not None:
                 enhanced_system_prompt = re.sub(
                     r"<memory>.*?</memory>",
@@ -174,30 +171,10 @@ class Dialogue:
                     flags=re.DOTALL,
                 )
 
-            # Inject Emotional AI state and thinking result
-            if emotion_desc is not None:
-                enhanced_system_prompt = re.sub(
-                    r"<emotional_state>.*?</emotional_state>",
-                    f"<emotional_state>\n{emotion_desc}\n</emotional_state>",
-                    enhanced_system_prompt,
-                    flags=re.DOTALL,
-                )
-            
-            if thinking_result is not None:
-                import json
-                thinking_str = json.dumps(thinking_result, ensure_ascii=False, indent=2)
-                enhanced_system_prompt = re.sub(
-                    r"<thinking_result>.*?</thinking_result>",
-                    f"<thinking_result>\n{thinking_str}\n</thinking_result>",
-                    enhanced_system_prompt,
-                    flags=re.DOTALL,
-                )
-
             dialogue.append({"role": "system", "content": enhanced_system_prompt})
 
-        # 添加用户和助手的对话
         for m in self.dialogue:
-            if m.role != "system":  # 跳过原始的系统消息
+            if m.role != "system":
                 self.getMessages(m, dialogue)
 
         return dialogue

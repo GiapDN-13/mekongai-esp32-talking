@@ -30,7 +30,7 @@ services:
       - ./app.py:/opt/xiaozhi-esp32-server/app.py
       - ./config.yaml:/opt/xiaozhi-esp32-server/config.yaml
       - ./config_from_api.yaml:/opt/xiaozhi-esp32-server/config_from_api.yaml
-      - ./storyteller-prompt.txt:/opt/xiaozhi-esp32-server/storyteller-prompt.txt
+      - ./qa-assistant-prompt.txt:/opt/xiaozhi-esp32-server/qa-assistant-prompt.txt
       - ./agent-base-prompt.txt:/opt/xiaozhi-esp32-server/agent-base-prompt.txt
     depends_on:
       qdrant:
